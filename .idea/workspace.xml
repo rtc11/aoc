@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3ebe247c-3b1b-4b1c-bc9e-e27c0a364cf3" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Class" />
+        <option value="Kotlin File" />
+      </list>
+    </option>
+  </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.0/241e9056f9415f6970a9d7d43de2a117b94959d0/kotlin-stdlib-common-1.6.0-sources.jar!/kotlin/collections/Maps.kt" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.0/241e9056f9415f6970a9d7d43de2a117b94959d0/kotlin-stdlib-common-1.6.0-sources.jar!/kotlin/collections/MapWithDefault.kt" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.6.0/241e9056f9415f6970a9d7d43de2a117b94959d0/kotlin-stdlib-common-1.6.0-sources.jar!/generated/_Collections.kt" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.6.0/a6284476c56bd752eb0020e062c78c930abdc168/kotlin-stdlib-1.6.0-sources.jar!/kotlin/Collections.kt" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="hd2elf16" />
+  </component>
+  <component name="ProjectId" id="21K6F3SsUS3EVD3Ee3bvm3DUSOo" />
+  <component name="ProjectViewState">
+    <option name="autoscrollToSource" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File" value="kotlin" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/2021/input" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.43739566" />
+    <property name="settings.editor.selected.configurable" value="preferences.language.Kotlin" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/2021/input" />
+      <recent name="$PROJECT_DIR$/2020/code/code" />
+      <recent name="$PROJECT_DIR$/2021/code" />
+      <recent name="$PROJECT_DIR$/shared" />
+      <recent name="$PROJECT_DIR$/2021" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Kotlin._7Kt">
+    <configuration name="_3Kt (1)" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="_3Kt" />
+      <module name="aoc.2021.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_4Kt (1)" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="_4Kt" />
+      <module name="aoc.2021.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_5Kt (1)" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="_5Kt" />
+      <module name="aoc.2021.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_6Kt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="_6Kt" />
+      <module name="aoc.2021.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="_7Kt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="_7Kt" />
+      <module name="aoc.2021.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Kotlin._7Kt" />
+        <item itemvalue="Kotlin._6Kt" />
+        <item itemvalue="Kotlin._5Kt (1)" />
+        <item itemvalue="Kotlin._4Kt (1)" />
+        <item itemvalue="Kotlin._3Kt (1)" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3ebe247c-3b1b-4b1c-bc9e-e27c0a364cf3" name="Changes" comment="" />
+      <created>1637677325203</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1637677325203</updated>
+      <workItem from="1637677328621" duration="375000" />
+      <workItem from="1637677721772" duration="995000" />
+      <workItem from="1637678763306" duration="27022000" />
+      <workItem from="1637920929170" duration="70748000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="JetRunConfigurationType">
+        <watch expression="value.length == 4 &amp;&amp; value.toInt() in 1920..2002" language="kotlin" />
+        <watch expression="value.length == 4 &amp;&amp; value.toInt() in 2010..2020" language="kotlin" />
+        <watch expression="value.length == 4 &amp;&amp; value.toInt() in 2020..2030" language="kotlin" />
+        <watch expression="verifyHeight(value)" language="kotlin" />
+        <watch expression="value[0] == '#' &amp;&amp; &quot;0-9a-f&quot;.toRegex().matches(value.substring(1, 7))" language="kotlin" />
+        <watch expression="listOf(&quot;amb&quot;, &quot;blu&quot;, &quot;brn&quot;, &quot;gry&quot;, &quot;grn&quot;, &quot;hzl&quot;, &quot;oth&quot;).contains(value)" language="kotlin" />
+        <watch expression="value.length == 9 &amp;&amp; &quot;0-9&quot;.toRegex().matches(value)" language="kotlin" />
+      </configuration>
+    </watches-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
