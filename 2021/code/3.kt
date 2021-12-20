@@ -39,12 +39,12 @@ private fun calculate(input: List<Bits>): List<Int> =
 
 private fun gammaRate(bitCountPerPosition: List<Map<Int, Int>>): Int {
     val bits = bitCountPerPosition.map { bitToCount -> if (bitToCount[0]!! > bitToCount[1]!!) 0 else 1 }
-    return binaryToInt(combineString(bits))
+    return binaryToDecimal(combineString(bits))
 }
 
 private fun epsilonRate(bitCountPerPosition: List<Map<Int, Int>>): Int {
     val bits = bitCountPerPosition.map { bitToCount -> if (bitToCount[0]!! > bitToCount[1]!!) 1 else 0 }
-    return binaryToInt(combineString(bits))
+    return binaryToDecimal(combineString(bits))
 }
 
 private fun calculateRating(
@@ -60,7 +60,7 @@ private fun calculateRating(
         filteredInput = filteredInput.filter { predicate(pos, filteredBitCount, it) }
         filteredBitCount = filteredInput.countPerPosition()
     }
-    return binaryToInt(combineString(filteredInput.single()))
+    return binaryToDecimal(combineString(filteredInput.single()))
 }
 
 private fun oxygenRating(input: List<Bits>, bitMap: List<Map<Int, Int>>): Int =
