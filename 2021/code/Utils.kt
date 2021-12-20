@@ -15,3 +15,7 @@ fun <A, B> Map<A, B>.flip(): Map<B, A> = entries.associateBy({ it.value }) { it.
 
 inline fun <T, R : Comparable<R>> Iterable<T>.minBy(selector: (T) -> R): T = minByOrNull(selector)!!
 inline fun <T, R : Comparable<R>> Iterable<T>.maxBy(selector: (T) -> R): T = maxByOrNull(selector)!!
+
+fun <T> List<T>.join(): String = joinToString("")
+
+infix fun <T> List<T>.slice(startIndex: Int): List<T> = slice(startIndex until size - 1)

@@ -176,7 +176,6 @@ data class Step(
     val steps: List<Step> = listOf(),
 )
 
-fun <T> List<T>.join(): String = joinToString("")
 fun List<Char>.hasRemainder() = isNotEmpty() && any { it != '0' }
 fun List<Char>.numOfBitsByMode(): Int = if (this[6] == '0') 15 else 11
 fun List<Char>.slice(startIndex: Int): List<Char> = slice(startIndex until size)
