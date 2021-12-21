@@ -22,13 +22,13 @@ private fun playPartOne(p1Pos: Int, p2Pos: Int, p1Score: Int = 0, p2Score: Int =
     return playPartOne(newP1Pos, newP2Pos, newP1Score, newP2Score, rolls + 6, roll(6))
 }
 
-data class Player(val name: String, var pos: Int, var score: Int) {
+data class Player(val name: String, var pos: Int, var score: Int = 0) {
     fun move(roll: Int) {
         pos += roll
         while (pos > 10) pos -= 10
     }
 
-    fun scoreInc() {
+    fun increaseScore() {
         score += pos
     }
 }
@@ -36,61 +36,57 @@ data class Player(val name: String, var pos: Int, var score: Int) {
 data class Game(var p1: Player, var p2: Player) {
     private var turn: Player = p1
     var rollCount: Int = 0
-    var totalRollCount: Int = 0
 
     fun winner(score: Long): Player? = if (p1.score >= score) p1 else if (p2.score >= score) p2 else null
 
     fun roll(roll: Int): Game {
         turn.move(roll)
-        rollCount++
-        totalRollCount++
-        if (rollCount == 3) {
-            turn.scoreInc()
+        if (++rollCount == 3) { // switch turn?
+            turn.increaseScore()
             turn = if (turn == p1) p2 else p1
             rollCount = 0
         }
         return this
     }
 
-    fun cp(): Game {
-        val res = Game(p1.copy(), p2.copy())
-        res.turn = if (turn == p1) res.p1 else res.p2
-        res.rollCount = rollCount.toString().toInt()
-        res.totalRollCount = totalRollCount.toString().toInt()
-        return res
+    // custom copy to save memory
+    fun cp(): Game = Game(p1.copy(), p2.copy()).apply {
+        turn = if (this@Game.turn == p1) p1 else p2
+        rollCount = this@Game.rollCount
     }
 }
 
-fun HashMap<Game, Long>.addCount(game: Game, count: Long) {
-    this[game] = if (containsKey(game)) this[game]!! + count else count
-}
-
-fun quantumRoll(game: Game): List<Game> {
-    val games = listOf(game.cp(), game.cp(), game.cp())
-    games.forEachIndexed { i, g -> g.roll(i + 1) }
-    return games
+fun quantumRoll(game: Game): List<Game> = listOf(game.cp(), game.cp(), game.cp()).mapIndexed { i, g ->
+    g.roll(i + 1) // 1 2 3
 }
 
 fun playPartTwo(p1Start: Int, p2Start: Int): Long {
     var states: HashMap<Game, Long> = hashMapOf()
-    val startGame = Game(Player("p1", p1Start, 0), Player("p2", p2Start, 0))
-    states[startGame] = 1
+    val initialGame = Game(Player("p1", p1Start), Player("p2", p2Start))
+    states[initialGame] = 1
 
-    while (states.any { it.key.winner(21) == null }) {
+    fun HashMap<Game, Long>.addCount(game: Game, count: Long) =
+        when (containsKey(game)) {
+            true -> this[game] = this[game]!! + count // increase similar game
+            false -> this[game] = count // add current state
+        }
+
+    // while active games
+    while (states.any { (game, _) -> game.winner(21) == null }) {
         val newStates: HashMap<Game, Long> = hashMapOf()
 
         states.forEach { (game, count) ->
             when (game.winner(21)) {
-                null -> quantumRoll(game).forEach { newGame -> newStates.addCount(newGame, count) }
-                else -> newStates.addCount(game, count)
+                null -> quantumRoll(game).forEach { newGame -> newStates.addCount(newGame, count) } // split universe
+                else -> newStates.addCount(game, count) // keep state
             }
         }
         states = newStates
     }
 
     return states
-        .map { entry -> entry.key.winner(21)!!.name to entry.value }
-        .groupBy { it.first }
-        .mapValues { it.value.sumOf { list -> list.second } }
-        .maxOf { it.value }
+        .map { (game, wins) -> game.winner(21)!!.name to wins }
+        .groupingBy { (player, _) -> player }
+        .fold(0L) { totalWins, (_, wins) -> totalWins + wins }
+        .maxOf { (_, totalWins) -> totalWins }
 }
