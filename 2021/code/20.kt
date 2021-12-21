@@ -1,18 +1,18 @@
 fun main() {
-    input("20.test.txt").countLit(2) // 35
-    input("20.test.txt").countLit(50) // 3351
-
-    input("20.txt").countLit(2) // 5395
-    input("20.txt").countLit(50) // 19959 an 18967 is too high
+//    input("20.test.txt").countLit(2) // 35
+//    input("20.test.txt").countLit(50) // 3351
+//
+//    input("20.txt").countLit(2) // 5395
+    input("20.txt").countLit(50) // 17584
 }
 
 fun List<String>.countLit(iterations: Int) {
-    val img = takeLastWhile { l -> l != "" }.enlarge(iterations + 3)
+    val img = takeLastWhile { l -> l != "" }.enlarge(iterations + 100)
     val alg = first()
     recursive(img, alg, iterations)
 //        .print()
-        .slice(2 until img.size - 2)
-        .map { it.slice(2 until it.length - 2) }
+        .slice(10 until img.size - 100)
+        .map { it.slice(100 until it.length - 100) }
         .sumOf { it.count { c -> c == '#' } }
         .let { println("Part One $it") }
 }
