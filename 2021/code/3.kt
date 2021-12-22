@@ -86,9 +86,9 @@ private fun List<Bits>.countPerPosition(): List<Map<Int, Int>> {
     return binaryLength.mapIndexed { pos, _ -> map { it[pos] }.groupBy { it }.mapValues { it.value.size } }
 }
 
-fun print(msg: String, color: Int) = print(colorize(msg, Attribute.TEXT_COLOR(color)))
+private fun print(msg: String, color: Int) = print(colorize(msg, Attribute.TEXT_COLOR(color)))
 
-fun printPosition(listOfBits: List<Bits>, index: Int) {
+private fun printPosition(listOfBits: List<Bits>, index: Int) {
     if (DEBUG) {
         println("")
         val caret = 3 * index + 1
