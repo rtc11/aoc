@@ -5,8 +5,8 @@ fun main() {
     input("dec_01_part1.txt").let(::part2).also(::println)
 }
 
-fun part1(input: List<String>): Int = calories(input).max()
-fun part2(input: List<String>): Int = calories(input).sortedDescending().take(3).sum()
+private fun part1(input: List<String>): Int = calories(input).max()
+private fun part2(input: List<String>): Int = calories(input).sortedDescending().take(3).sum()
 
 fun calories(input: List<String>): List<Int> {
     val calories = mutableListOf<Int>()
