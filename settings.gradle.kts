@@ -1,4 +1,3 @@
 rootProject.name = "aoc"
 
-include("2020")
-include("2021")
+include("2020", "2021", "2022")
