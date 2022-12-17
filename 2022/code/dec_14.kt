@@ -161,7 +161,7 @@ private fun print(map: MutableMap<Pair<Int, Int>, String>) {
     println()
 }
 
-data class Coordinate(
+private data class Coordinate(
     val x: Int,
     val y: Int,
     val value: String = "#",
