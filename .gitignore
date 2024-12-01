@@ -3,6 +3,7 @@
 
 # Except...
 !.gitignore
+!.gitattributes
 !*.c3
 !README.md
 
