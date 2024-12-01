@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except...
+!.gitignore
+!*.c3
+!README.md
+
