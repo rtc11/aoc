@@ -1,77 +1,86 @@
 import std::io;
-import std::math;
-import std::collections;
-import input;
+import std::time;
 
-struct Day2 {
-    List(<usz>) levels;
-}
-
-fn Day2 into_day2(String line) {
-    String[] split = line.tsplit(" ");
-    List(<usz>) levels;
-    foreach(lvl : split) {
-        levels.push(lvl.to_long()!!);
+fn bool int[].steady_inc(self, int prev, int skip) 
+{
+    bool is_inc = self[0] > prev;
+    if (self[0] - prev == 0) return false;
+    for(int i = 0; i < self.len; i++) {
+        if (skip == i) continue;
+        int diff = self[i] - prev; 
+        if (is_inc != (diff >= 1 && diff <= 3)) return false;
+        if (!is_inc != (diff <= -1 && diff >= -3)) return false;
+        prev = self[i];
     }
-    return Day2 { levels };
+    return true;
 }
 
-fn void! main()
+fn bool int[].is_safe(self, int skip)
 {
-    Input(<Day2>) input = input::from(<Day2>)("input.txt", &into_day2);
-
-//    foreach(line : input.lines) {
-//        foreach(lvl: line.levels) {
-//            io::printf("%s ", lvl);
-//        }
-//        io::printn("");
-//    }
-
-    input.part1();
-    //input.part2();
+	if (skip == 0) {
+		skip = -1;
+		self = self[1..];
+	}
+	int prev = self[0];
+	if (skip == 1) {
+		self = self[1..];
+		skip = -1;
+	}
+	self = self[1..];
+	skip--;
+    return self.steady_inc(prev, skip);
 }
 
-fn bool Day2.left_is_good(&self, usz curr) 
+fn int! part1()
 {
-    long diff = math::abs(self.levels[curr - 1] - self.levels[curr]);
-    return diff >= 1 && diff <= 3;
-}
-
-fn bool Day2.right_is_good(&self, usz curr) 
-{
-    if (curr + 1 < self.levels.len()) {
-        long diff = math::abs(self.levels[curr] - self.levels[curr + 1]);
-        return diff >= 1 && diff <= 3;
-    } else {
-        return true;
-    }
-}
-
-fn void Input(<Day2>).part1(&self)
-{
-    int safe_count = 0;
-
-    foreach(line : self.lines) {
-        usz curr = 1;
-        bool safe = true;
-        bool inc= true;
-        bool dec = true;
-
-        while (curr < line.levels.len()) {
-            if (line.levels[curr - 1] < line.levels[curr] && line.left_is_good(curr) && line.right_is_good(curr)) {
-                dec = false;
-            } else if (line.levels[curr - 1] > line.levels[curr] && line.left_is_good(curr) && line.right_is_good(curr)) {
-                inc = false;
-            } else {
-                safe = false;
-            }
-            curr++;
+	File f = file::open("input.txt", "rb")!;
+	defer (void)f.close();
+	int total = 0;
+	while (try line = io::treadline(&f))
+	{
+		String[] split = line.tsplit(" ");
+		int[10] buf;
+        for (int i = 0; i < split.len; i++) {
+			buf[i] = split[i].to_int()!!;
         }
-        if (safe && inc != dec) {
-            safe_count++;
-        }
-    }
-
-    io::printfn("safe levels: %s", safe_count);
+		int[] val = buf[:split.len];
+		if (val.is_safe(-1)) {
+			total++;
+		}
+	}
+	return total;
 }
 
+fn int! part2()
+{
+	File f = file::open("input.txt", "rb")!;
+	defer (void)f.close();
+	int total = 0;
+	while (try line = io::treadline(&f))
+	{
+		String[] split = line.tsplit(" ");
+		int[10] buf;
+        for (int i = 0; i < split.len; i++) {
+			buf[i] = split[i].to_int()!!;
+        }
+		int[] val = buf[:split.len];
+		if (val.is_safe(-1)) {
+			total++;
+			continue;
+		}
+		for (int i = val.len; i >= 0; i--) {
+			if (val.is_safe(i)) {
+				total++;
+				break;
+			}
+		}
+	}
+	return total;
+}
+
+fn void main()
+{
+    Clock c = clock::now();
+    io::printfn("- Part1: %d - %s", part1()!!, c.mark());
+    io::printfn("- Part2: %d - %s", part2()!!, c.mark());
+}
