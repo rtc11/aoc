@@ -22,10 +22,10 @@ fn bool valid_calibration(long sum, long[] operands, Operator[] operators) =>
 fn bool dfs(long sum, long[] operands, usz pos, long cur, Operator[] operators)
 {
     if (pos >= operands.len) return sum == cur;
-    bool r;
     foreach (operator: operators) {
-        r = dfs(sum, operands, pos + 1, operator(cur, operands[pos]), operators);
-        if (r) return true;
+        if(dfs(sum, operands, pos + 1, operator(cur, operands[pos]), operators)) {
+            return true;
+        }
     }
     return false;
 }
@@ -53,23 +53,15 @@ fn long solve(Operator[] operators)
     return total;
 }
 
-fn long part1()
-{
-    Operator[] operators = { &add, &mul };
-    return solve(operators);
-}
-fn long! part2()
-{
-    Operator[] operators = { &add, &mul, &combine };
-    return solve(operators);
-}
+fn long part1() => solve({ &add, &mul }); 
+fn long part2() => solve({ &add, &mul, &combine });
 
 fn void main()
 {
     @pool() {
         Clock c = clock::now();
         io::printfn("- Part1: %d - %s", part1(), c.mark());
-        io::printfn("- Part2: %d - %s", part2()!!, c.mark());
+        io::printfn("- Part2: %d - %s", part2(), c.mark());
     };
 }
 
