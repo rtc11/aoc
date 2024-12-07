@@ -9,6 +9,12 @@ def Operator = fn long(long, long);
 
 fn long add(long a, long b) => a + b;
 fn long mul(long a, long b) => a * b;
+fn long combine(long a, long b)
+{
+    String str_a = string::tformat("%d", a);
+    String str_b = string::tformat("%d", b);
+    return str_a.tconcat(str_b).to_long()!!;
+}
 
 fn bool valid_calibration(long sum, long[] operands, Operator[] operators) => 
     dfs(sum, operands, 1, operands[0], operators);
@@ -24,12 +30,11 @@ fn bool dfs(long sum, long[] operands, usz pos, long cur, Operator[] operators)
     return false;
 }
 
-fn long part1()
+fn long solve(Operator[] operators)
 {
 	String input = (String)file::load_temp(FILE)!!;
     long total = 0;
     long[64] operands;
-    Operator[] operators = { &add, &mul };
 
     foreach (line: input.tsplit("\n")) {
         if (!line.len) continue;
@@ -48,9 +53,15 @@ fn long part1()
     return total;
 }
 
+fn long part1()
+{
+    Operator[] operators = { &add, &mul };
+    return solve(operators);
+}
 fn long! part2()
 {
-    return 0;
+    Operator[] operators = { &add, &mul, &combine };
+    return solve(operators);
 }
 
 fn void main()
