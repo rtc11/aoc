@@ -1,16 +1,15 @@
 import std::io;
 import std::math;
 import std::collections;
-import input;
 
-struct Day1 {
+struct Pair {
     usz left;
     usz right;
 }
 
-fn Day1 into_day1(String line) {
+fn Pair into_day1(String line) {
     String[] split = line.tsplit("   ");
-    return Day1 {
+    return Pair {
         split[0].to_long()!!, 
         split[1].to_long()!!
     };
@@ -18,20 +17,26 @@ fn Day1 into_day1(String line) {
 
 fn void! main()
 {
-    Input(<Day1>) input = input::from(<Day1>)("test.txt", &into_day1);
-    input.part1();
-    input.part2();
+    File f = file::open("test.txt", "rb")!!; 
+    defer (void) f.close();
+    List(<Pair>) pairs;
+    while (try line = io::treadline(&f)) 
+    {
+        pairs.push(into_day1(line));
+    }
+    part1(pairs);
+    part2(pairs);
 }
 
-fn void Input(<Day1>).part1(&self)
+fn void part1(List(<Pair>) pairs)
 {
     PriorityQueue(<long>) left, right;
     long sum = 0;
     left.temp_init();
     right.temp_init();
-    foreach(line : self.lines) {
-        left.push(line.left);
-        right.push(line.right);
+    foreach(pair : pairs) {
+        left.push(pair.left);
+        right.push(pair.right);
     }
 
     while (left.len()) {
@@ -44,17 +49,27 @@ fn void Input(<Day1>).part1(&self)
     io::printfn("part1: %d" , sum);
 }
 
-fn void Input(<Day1>).part2(&self)
+fn void part2(List(<Pair>) pairs)
 {
     List(<usz>) right;
-    foreach(line : self.lines) {
-        right.push(line.right);
+    foreach(pair : pairs) {
+        right.push(pair.right);
     }
     usz sum = 0;
-    foreach (line : self.lines) {
-        sum += line.left * input::count(<Day1>)(line.left, right);
+    foreach (pair : pairs) {
+        sum += pair.left * count(pair.left, right);
     }
     right.free();
     io::printfn("part2: %d", sum);
 }
 
+fn usz count(usz num, List(<usz>) list)
+{
+    usz sum = 0;
+    foreach (l : list) {
+        if (l == num) {
+            sum++;
+        }
+    }
+    return sum;
+}
