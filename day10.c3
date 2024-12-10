@@ -3,8 +3,6 @@ import std::time;
 import std::collections;
 import std::math;
 
-const String FILE = "input.txt";
-
 fn void main()
 {
     @pool() {
@@ -14,20 +12,27 @@ fn void main()
     };
 }
 
+const String FILE = "input.txt";
 def Map = List(<String>);
 def Pos = isz[<2>];
 def Queue = List(<Pos>);
-def Part = fn long(HashMap(<Pos, int>));
-
+def Trail = HashMap(<Pos, int>);
+def Part = fn long!(Map, Queue);
+Pos[4] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 macro uint Pos.hash(Pos s) => string::tformat("%s", s).hash();
 
-fn long part1(HashMap(<Pos, int>) trail) => trail.len();
-
-fn long part2(HashMap(<Pos, int>) trail)
+fn long! part1(Map map, Queue trail)
 {
+    Trail walked = walk(map, trail)!;
+    return walked.len();
+}
+
+fn long! part2(Map map, Queue trail)
+{
+    Trail walked = walk(map, trail)!;
     usz sum;
-    trail.@each(; Pos pos, int visited_count) {
-        sum += visited_count;
+    walked.@each(; Pos pos, int visit_count) {
+        sum += visit_count;
     };
     return sum;
 }
@@ -35,55 +40,44 @@ fn long part2(HashMap(<Pos, int>) trail)
 fn long! solve(Part part)
 {
 	String input = (String) file::load_temp(FILE)!;
-    input = input.trim();
-
+    usz sum;
     Queue queue;
     Queue trail;
     Map map;
     map.temp_init();
 
-    String[] lines = input.tsplit("\n");
-    foreach(x, line: lines) {
+    foreach(x, line: input.tsplit("\n")) {
         if (!line.len) continue;
         map.push(line);
         foreach(y, ch: line) {
-            if (ch == '0') trail.push({x, y});
+            if (ch == '0') queue.push({x, y});
         }
     }
 
-    usz sum;
-    foreach(t: trail) {
-        queue.clear();
-        queue.temp_init();
-        queue.push(t);
-        sum += part(trail_length(map, queue)!);
+    foreach(t: queue) {
+        trail.clear();
+        trail.temp_init();
+        trail.push(t);
+        sum += part(map, trail)!;
     }
 
 	return sum;
 }
 
-Pos[4] directions = {
-    { 1, 0},
-    {-1, 0},
-    { 0, 1},
-    { 0,-1},
-};
-
-fn HashMap(<Pos, int>)! trail_length(Map map, Queue queue)
+fn Trail! walk(Map map, Queue trail)
 {
     Pos pos;
     char cur;
-    HashMap(<Pos, int>) visited;
+    Trail visited;
     visited.temp_init();
     
-    while LOOP: (queue.len())
-    {
-        pos = queue.pop()!;
+    while WALKING: (trail.len()) {
+        pos = trail.pop()!;
         cur = map[pos.x][pos.y];
         if (cur == '9') {
             if (!visited.has_key(pos)) visited[pos] = 0;
             (*visited.get_ref(pos)!!)++;
-            continue LOOP;
+            continue WALKING;
         }
 
         foreach(dir: directions) {
@@ -91,7 +85,7 @@ fn HashMap(<Pos, int>)! trail_length(Map map, Queue queue)
             if (next.x < 0 || next.x >= map.len()) continue;
             if (next.y < 0 || next.y >= map[0].len) continue;
             if (map[next.x][next.y] - cur != 1) continue;
-            queue.push(next);
+            trail.push(next);
         }
     }
     return visited;
