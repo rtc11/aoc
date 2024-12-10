@@ -13,12 +13,15 @@ fn void main()
 }
 
 const String FILE = "input.txt";
+
 def Map = List(<String>);
 def Pos = isz[<2>];
 def Queue = List(<Pos>);
 def Trail = HashMap(<Pos, int>);
 def Part = fn long!(Map, Queue);
+
 Pos[4] directions = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+
 macro uint Pos.hash(Pos s) => string::tformat("%s", s).hash();
 
 fn long! part1(Map map, Queue trail)
@@ -54,10 +57,10 @@ fn long! solve(Part part)
         }
     }
 
-    foreach(t: queue) {
+    foreach(pos: queue) {
         trail.clear();
         trail.temp_init();
-        trail.push(t);
+        trail.push(pos);
         sum += part(map, trail)!;
     }
 
