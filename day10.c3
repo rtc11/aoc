@@ -9,48 +9,30 @@ fn void main()
 {
     @pool() {
         Clock c = clock::now();
-        io::printfn("- Part1: %d - %s", part1()!!, c.mark());
-        io::printfn("- Part2: %d - %s", part2()!!, c.mark());
+        io::printfn("- Part1: %d - %s", solve(&part1)!!, c.mark());
+        io::printfn("- Part2: %d - %s", solve(&part2)!!, c.mark());
     };
 }
 
 def Map = List(<String>);
 def Pos = isz[<2>];
 def Queue = List(<Pos>);
+def Part = fn long(HashMap(<Pos, int>));
 
 macro uint Pos.hash(Pos s) => string::tformat("%s", s).hash();
 
-fn long! part1()
+fn long part1(HashMap(<Pos, int>) trail) => trail.len();
+
+fn long part2(HashMap(<Pos, int>) trail)
 {
-	String input = (String) file::load_temp(FILE)!;
-    input = input.trim();
-
-    Queue queue;
-    Queue trail;
-    Map map;
-    map.temp_init();
-
-    String[] lines = input.tsplit("\n");
-    foreach(x, line: lines) {
-        if (!line.len) continue;
-        map.push(line);
-        foreach(y, ch: line) {
-            if (ch == '0') trail.push({x, y});
-        }
-    }
-
     usz sum;
-    foreach(t: trail) {
-        queue.clear();
-        queue.temp_init();
-        queue.push(t);
-        sum += trail_length(map, queue)!.len();
-    }
-
-	return sum;
+    trail.@each(; Pos pos, int visited_count) {
+        sum += visited_count;
+    };
+    return sum;
 }
 
-fn long! part2()
+fn long! solve(Part part)
 {
 	String input = (String) file::load_temp(FILE)!;
     input = input.trim();
@@ -74,10 +56,7 @@ fn long! part2()
         queue.clear();
         queue.temp_init();
         queue.push(t);
-        HashMap(<Pos, int>) tl = trail_length(map, queue)!;
-        tl.@each(; Pos pos, int visited_count) {
-            sum += visited_count;
-        };
+        sum += part(trail_length(map, queue)!);
     }
 
 	return sum;
