@@ -25,11 +25,10 @@ fn long! part1()
 	String input = (String) file::load_temp(FILE)!;
     input = input.trim();
 
-    Map map;
-    map.temp_init();
-
     Queue queue;
     Queue trail;
+    Map map;
+    map.temp_init();
 
     String[] lines = input.tsplit("\n");
     foreach(x, line: lines) {
@@ -45,7 +44,40 @@ fn long! part1()
         queue.clear();
         queue.temp_init();
         queue.push(t);
-        sum += trail_length(map, queue)!;
+        sum += trail_length(map, queue)!.len();
+    }
+
+	return sum;
+}
+
+fn long! part2()
+{
+	String input = (String) file::load_temp(FILE)!;
+    input = input.trim();
+
+    Queue queue;
+    Queue trail;
+    Map map;
+    map.temp_init();
+
+    String[] lines = input.tsplit("\n");
+    foreach(x, line: lines) {
+        if (!line.len) continue;
+        map.push(line);
+        foreach(y, ch: line) {
+            if (ch == '0') trail.push({x, y});
+        }
+    }
+
+    usz sum;
+    foreach(t: trail) {
+        queue.clear();
+        queue.temp_init();
+        queue.push(t);
+        HashMap(<Pos, int>) tl = trail_length(map, queue)!;
+        tl.@each(; Pos pos, int visited_count) {
+            sum += visited_count;
+        };
     }
 
 	return sum;
@@ -58,11 +90,11 @@ Pos[4] directions = {
     { 0,-1},
 };
 
-fn usz! trail_length(Map map, Queue queue)
+fn HashMap(<Pos, int>)! trail_length(Map map, Queue queue)
 {
     Pos pos;
     char cur;
-    HashMap(<Pos, bool>) visited;
+    HashMap(<Pos, int>) visited;
     visited.temp_init();
     
     while LOOP: (queue.len())
@@ -70,7 +102,8 @@ fn usz! trail_length(Map map, Queue queue)
         pos = queue.pop()!;
         cur = map[pos.x][pos.y];
         if (cur == '9') {
-            if (!visited.has_key(pos)) visited[pos] = true;
+            if (!visited.has_key(pos)) visited[pos] = 0;
+            (*visited.get_ref(pos)!!)++;
             continue LOOP;
         }
 
@@ -82,13 +115,6 @@ fn usz! trail_length(Map map, Queue queue)
             queue.push(next);
         }
     }
-    return visited.len();
-}
-
-fn long! part2()
-{
-	String input = (String)file::load_temp(FILE)!;
-	input = input.trim();
-	return 0;
+    return visited;
 }
 
