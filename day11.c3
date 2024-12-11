@@ -7,7 +7,9 @@ fn void main()
 {
     @pool() {
         Clock c = clock::now();
-        //io::printfn("- Part1: %d - %s", solve(25)!!, c.mark());
+        stones.temp_init();
+        mem.temp_init();
+        io::printfn("- Part1: %d - %s", solve(25)!!, c.mark());
         io::printfn("- Part2: %d - %s", solve(75)!!, c.mark());
     };
 }
@@ -18,7 +20,6 @@ def Stones = HashMap(<usz, usz>);
 def Memoization = HashMap(<usz, List(<usz>)>);
 Stones stones;
 Memoization mem;
-
 
 fn bool is_even(usz num) => num > 0 && (string::tformat("%s", num).len % 2) == 0; 
 fn bool is_zero(usz num) => num == 0;
@@ -79,8 +80,8 @@ fn void! blink()
 fn long! solve(int blinks)
 {
 	String input = (String) file::load_temp(FILE)!;
-    stones.temp_init();
-    mem.temp_init();
+    stones.clear();
+    mem.clear();
     parse(input.trim())!;
     usz sum = 0;
 
@@ -91,7 +92,6 @@ fn long! solve(int blinks)
         sum += count;
     };
 
-    io::printfn("%d", mem.len());
     return sum;
 }
 
