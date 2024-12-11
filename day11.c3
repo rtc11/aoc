@@ -44,10 +44,8 @@ fn List(<usz>)! rule(usz stone)
             change.push(1); 
         case is_even(stone):
             String num_str = string::tformat("%s", stone); 
-            String left = (String) num_str[..num_str.len/2 -1];
-            String right = (String) num_str[(num_str.len/2)..];
-            change.push(left.to_long()!);
-            change.push(right.to_long()!);
+            change.push(num_str[..num_str.len/2 -1].to_long()!);
+            change.push(num_str[(num_str.len/2)..].to_long()!);
         default: 
             change.push(stone * 2024);
     }
