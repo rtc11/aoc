@@ -24,56 +24,48 @@ Memoization mem;
 fn bool is_even(usz num) => num > 0 && (string::tformat("%s", num).len % 2) == 0; 
 fn bool is_zero(usz num) => num == 0;
 
-fn void! parse(String input) {
+fn void! parse(String input)
+{
     foreach(stone: input.tsplit(" ")) {
         usz num = stone.to_long()!!;
-        if (stones.has_key(num)) {
-            stones[num] = stones[num]! + 1;
-        } else {
-            stones[num] = 1;
-        }
+        stones[num] = stones.@get_or_set(num, 1);
     }
 }
 
 fn List(<usz>)! rule(usz stone)
 {
-    List(<usz>) s;
     if (mem.has_key(stone)) {
-        s = mem[stone]!;
-    } else {
-        switch {
-            case is_zero(stone): 
-                s.push(1); 
-            case is_even(stone):
-                String num_str = string::tformat("%s", stone); 
-                String left = (String) num_str[..num_str.len/2 -1];
-                String right = (String) num_str[(num_str.len/2)..];
-                s.push(left.to_long()!!);
-                s.push(right.to_long()!!);
-            default: s.push(stone * 2024);
-        }
+        return mem[stone]!;
+    } 
 
+    List(<usz>) change;
+    switch {
+        case is_zero(stone): 
+            change.push(1); 
+        case is_even(stone):
+            String num_str = string::tformat("%s", stone); 
+            String left = (String) num_str[..num_str.len/2 -1];
+            String right = (String) num_str[(num_str.len/2)..];
+            change.push(left.to_long()!);
+            change.push(right.to_long()!);
+        default: 
+            change.push(stone * 2024);
     }
-
-    mem[stone] = s;
-    return s;
+    mem[stone] = change;
+    return change;
 }
 
 fn void! blink()
 {
-    Stones new;
-    new.temp_init();
+    Stones changed;
+    changed.temp_init();
     stones.@each(; usz stone, usz count) {
-        List(<usz>) split = rule(stone)!;
-        foreach(s: split){
-            if (new.has_key(s)) {
-            new[s] = new[s]! + count;
-            } else {
-                new[s] = count;
-            }
+        List(<usz>) changes = rule(stone)!;
+        foreach(change: changes) {
+            changed[change] = changed.@get_or_set(change, 0) + count;
         }
     };
-    @swap(stones, new);
+    @swap(stones, changed);
 
 }
 
@@ -82,12 +74,11 @@ fn long! solve(int blinks)
 	String input = (String) file::load_temp(FILE)!;
     stones.clear();
     mem.clear();
-    parse(input.trim())!;
     usz sum = 0;
+    parse(input.trim())!;
 
-    for (int b = 0; b <blinks; b++) {
-        blink()!;
-    }
+    for (int b = 0; b <blinks; b++) blink()!;
+
     stones.@each(; usz stone, usz count) {
         sum += count;
     };
