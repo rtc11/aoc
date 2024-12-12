@@ -4,8 +4,8 @@ fn void main()
 {
     @pool() {
         Clock c = clock::now();
-        io::printfn("- Part1: %d - %s", part1()!!, c.mark());
-        //io::printfn("- Part2: %d - %s", part2()!!, c.mark());
+        io::printfn("- Part1: %d - %s", part1(map)!!, c.mark());
+        io::printfn("- Part2: %d - %s", part2(map)!!, c.mark());
     };
 }
 
@@ -22,16 +22,37 @@ struct Region
 
 fn long! part1()
 {
-	String input = (String) file::load_temp("input.txt")!;
+    String input = (String) file::load_temp("input.txt")!;
     String[] map = input.trim().tsplit("\n");
+    Garden garden = solve(map)!;
+    usz sum;
+    foreach(region: garden) {
+        usz price = region.locations.len() * region.fences;
+        sum += price;
+    }
+    return sum;
+}
 
+fn long! part2()
+{
+    String input = (String) file::load_temp("input.txt")!;
+    String[] map = input.trim().tsplit("\n");
+    Garden garden = solve(map)!;
+    usz sum;
+    foreach(region: garden) {
+        usz price = horizontals(&region) + verticals(&region);
+        sum += region.locations.len() * price;
+    }
+    return sum;
+}
+
+fn Garden! solve(String[] map)
+{
     List(<Pos>) visited;
     visited.temp_init(); 
 
     Garden garden;
     garden.temp_init(); 
-
-    usz sum;
 
     for (int y; y<map.len; y++) {
         for(int x; x<map[0].len; x++) {
@@ -40,17 +61,14 @@ fn long! part1()
             if (visited.contains(pos)) continue;
             List(<Pos>) locations;
             Region region = { plant, 0, *locations.temp_init() };
-            //io::printf("creating region %s for %c", pos, plant);
             traverse(&region, &visited, pos, map)!;
             garden.push(region);
-            usz price = region.locations.len() * region.fences;
-            sum += price;
-            //io::printfn(". Price: %d * %d = %d", region.locations.len(), region.fences, price);
         }
     }
 
-    return sum;
+    return garden;
 }
+
 fn void! traverse(Region *region, List(<Pos>) *visited, Pos init, String[] map)
 {
     List(<Pos>) queue;
@@ -77,3 +95,20 @@ fn void! traverse(Region *region, List(<Pos>) *visited, Pos init, String[] map)
     }
 }
 
+fn usz horizontals(Region *region, String[] map)
+{
+    usz fences;
+    foreach(Pos pos: region.locations) {
+        
+    }
+    return fences;
+}
+
+fn usz verticals(Region *region, String[] map)
+{
+    usz fences;
+    foreach(Pos pos: region.locations) {
+
+    }
+    return fences;
+}
