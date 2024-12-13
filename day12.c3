@@ -4,8 +4,8 @@ fn void main()
 {
     @pool() {
         Clock c = clock::now();
-        io::printfn("- Part1: %d - %s", part1(map)!!, c.mark());
-        io::printfn("- Part2: %d - %s", part2(map)!!, c.mark());
+        io::printfn("- Part1: %d - %s", part1()!!, c.mark());
+        io::printfn("- Part2: %d - %s", part2()!!, c.mark());
     };
 }
 
@@ -22,7 +22,7 @@ struct Region
 
 fn long! part1()
 {
-    String input = (String) file::load_temp("input.txt")!;
+    String input = (String) file::load_temp("test.txt")!;
     String[] map = input.trim().tsplit("\n");
     Garden garden = solve(map)!;
     usz sum;
@@ -35,13 +35,12 @@ fn long! part1()
 
 fn long! part2()
 {
-    String input = (String) file::load_temp("input.txt")!;
+    String input = (String) file::load_temp("test.txt")!;
     String[] map = input.trim().tsplit("\n");
     Garden garden = solve(map)!;
     usz sum;
     foreach(region: garden) {
-        usz price = horizontals(&region) + verticals(&region);
-        sum += region.locations.len() * price;
+        sum += region.locations.len() * edges(&region);
     }
     return sum;
 }
@@ -95,20 +94,63 @@ fn void! traverse(Region *region, List(<Pos>) *visited, Pos init, String[] map)
     }
 }
 
-fn usz horizontals(Region *region, String[] map)
+Pos[8] all_dirs = { 
+    { 1, 0 }, //0 S 
+    {-1, 0 }, //1 N
+    { 0, 1 }, //2 E
+    { 0,-1 }, //3 W
+    { 1, 1 }, //4 SE
+    {-1,-1 }, //5 NW
+    { 1,-1 }, //6 SW
+    {-1, 1 }  //7 NE
+};
+
+fn usz edges(Region *region)
 {
-    usz fences;
+    usz edges;
     foreach(Pos pos: region.locations) {
+        // ?? 
+        // ?X
+        if (!region.locations.contains(pos + all_dirs[1]) && !region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[5])) {
+            edges++;
+        } 
+        // ?? 
+        // X?
+        if (!region.locations.contains(pos + all_dirs[1]) && !region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[7])) {
+            edges++;
+        } 
+        // X? 
+        // ??
+        if (!region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[4])) {
+            edges++;
+        }
+        // ?X 
+        // ??
+        if (!region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[6])) {
+            edges++;
+        }
+        // ?X
+        // XX
+        if (region.locations.contains(pos + all_dirs[1]) && region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[5])) {
+            edges++;
+        }
+        // X?
+        // XX
+        if (region.locations.contains(pos + all_dirs[1]) && region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[7])) {
+            edges++;
+        }
+        // XX
+        // X?
+        if (region.locations.contains(pos + all_dirs[2]) && region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[4])) {
+            edges++;
+        }
+        // XX
+        // ?X
+        if (region.locations.contains(pos + all_dirs[3]) && region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[6])) {
+            edges++;
+        }
         
     }
-    return fences;
+    return edges;
 }
 
-fn usz verticals(Region *region, String[] map)
-{
-    usz fences;
-    foreach(Pos pos: region.locations) {
-
-    }
-    return fences;
-}
