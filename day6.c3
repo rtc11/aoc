@@ -3,245 +3,104 @@ import std::time;
 import std::collections;
 import std::sort;
 
-const int SIZE = 130; // 130 // 10
-const String FILE = "input.txt";
-
-enum Entity
+fn void main()
 {
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN,
-    WALL,
-    VOID,
-    VISITED,
+    @pool() {
+        Clock c = clock::now();
+        visited.temp_init();
+        io::printfn("- Part1: %d - %s", part1()!!, c.mark());
+        io::printfn("- Part2: %d - %s", part2()!!, c.mark());
+    };
 }
 
-fn char Entity.view(self)
-{
-    switch (self) {
-        case Entity.WALL: return '#';
-        case Entity.UP: return '^';
-        case Entity.RIGHT: return '>';
-        case Entity.DOWN: return 'v';
-        case Entity.LEFT: return '<' ;
-        case Entity.VISITED: return 'X' ;
-        case Entity.VOID: return '.' ;
-        default: return '?';
-    }
+const String FILE = "test.txt";
+
+struct Player {
+    Pos pos;
+    Dir dir;
+}
+def Pos = isz[<2>];
+macro uint Pos.hash(Pos s) => string::tformat("%s", s).hash();
+
+enum Dir : (Pos pos) {
+    N = { 0,-1 },
+    E = { 1, 0 },
+    S = { 0, 1 },
+    W = {-1, 0 },
 }
 
-fault IllegalMove
+HashMap(<Pos, Dir>) visited;
+Player player;
+
+fn long! part1()
 {
-    NOT_A_PLAYER,
+    String input = (String) file::load_temp("input.txt")!;
+    String[] map = input.trim().tsplit("\n");
+    solve(map)!;
+    return visited.len();
 }
 
-fn Entity! Entity.turn_90(self)
+fn long! part2()
 {
-    switch (self) {
-        case Entity.UP: return Entity.RIGHT;
-        case Entity.RIGHT: return Entity.DOWN;
-        case Entity.DOWN: return Entity.LEFT;
-        case Entity.LEFT: return Entity.UP;
-        default: return IllegalMove.NOT_A_PLAYER?;
-    }
-}
-
-fn int[<2>] Entity[SIZE][SIZE].guard(self)
-{
-    for(int y = 0; y < SIZE; y++) {
-        for(int x = 0; x < SIZE; x++) {
-            switch (self[y][x]) {
-                case Entity.RIGHT:
-                case Entity.LEFT:
-                case Entity.UP:
-                case Entity.DOWN:
-                    return { x, y };
-                default:
-                    break;
-            }
+    String input = (String) file::load_temp("input.txt")!;
+    String[] map = input.trim().tsplit("\n");
+    usz loops;
+    char tmp;
+    for (int y; y< map.len; y++) {
+        for (int x; x < map[0].len; x++) {
+           tmp = map[y][x];
+           map[y][x] = '#';
+           loops += solve(map)!;
+           map[y][x] = tmp;
         }
     }
-    return { 0, 0 };
+    return loops;
 }
 
-fn Entity[SIZE][SIZE]! load_map()
+fn long! solve(String[] map)
 {
-	File f = file::open(FILE, "r")!;
-	defer (void)f.close();
-    int y = 0;
-    Entity[SIZE][SIZE] map;
-	while (try line = io::treadline(&f)) {
-        foreach(x, ch : line) {
-            switch (ch) {
-                case '^': 
-                    map[y][x] = Entity.UP;
-                case '>': 
-                    map[y][x] = Entity.RIGHT;
-                case '<': 
-                    map[y][x] = Entity.LEFT;
-                case 'v': 
-                    map[y][x] = Entity.DOWN;
-                case '#': 
-                    map[y][x] = Entity.WALL;
-                default: 
-                    map[y][x] = Entity.VOID;
-            }
+    player = { {0,0}, Dir.N };
+    int loops;
+
+    foreach (y, line: map) {
+        for (int x; x<line.len; x++) {
+            if (line[x] == '^') player.pos = { x, y };
         }
-        y++;
     }
-    return map;
+
+    for(int i; i< map.len * map[0].len; i++) {
+        if (i == map.len * map[0].len -1) loops++;
+        Pos next = player.pos + player.dir.pos;
+        visited[player.pos] = player.dir;
+        if (next.x < 0 || next.x >= map.len || next.y < 0 || next.y >= map.len) break;
+
+        if (map[next.y][next.x] == '#') {
+            switch (player.dir) {
+                case Dir.N: player.dir = Dir.E;
+                case Dir.E: player.dir = Dir.S;
+                case Dir.S: player.dir = Dir.W;
+                case Dir.W: player.dir = Dir.N;
+            }
+        } else {
+            player.pos = next;
+        }
+    }
+
+    return loops;
 }
 
-fn void Entity[SIZE][SIZE].view(self)
+fn void print(String[] map)
 {
-    for(int y=0; y<SIZE; y++) {
-        for(int x=0; x<SIZE; x++) {
-            io::printf("%c", self[y][x].view());
+    foreach (y, line: map) {
+        for (int x; x<line.len; x++) {
+            if (visited.has_key({x,y})) {
+                io::printf("%c", 'X');
+            } else {
+                io::printf("%c", map[y][x]);
+            }
         }
         io::printn();
     }
     io::printn();
-}
-
-fn long count(Entity[SIZE][SIZE] map, Entity entity)
-{
-    long count = 0;
-    for (int y = 0; y< SIZE; y++) {
-        for (int x = 0; x< SIZE; x++) {
-            if (map[y][x] == entity) count++;
-        }
-    }
-
-    return count;
-}
-
-fn bool out_of_bounds(int x, int y)
-{
-    return x < 0 || x == SIZE || y < 0 || y == SIZE;
-}
-
-fn long! part1()
-{
-    Entity[SIZE][SIZE] map = load_map()!;
-    int[<2>] guard = map.guard();
-    int x = guard[0];
-    int y = guard[1];
-    bool active = true;
-    while(active) {
-        if (out_of_bounds(x, y)) break;
-        switch (map[y][x]) {
-            case Entity.UP:  
-                if (out_of_bounds(x, y-1)) {
-                    map[y][x] = Entity.VISITED;
-                } else if (map[y-1][x] == Entity.VOID || map[y-1][x] == Entity.VISITED) {
-                    map[y][x] = Entity.VISITED;
-                    map[--y][x] = Entity.UP;
-                } else {
-                    map[y][x] = map[y][x].turn_90()!;
-                }
-            case Entity.RIGHT: 
-                if (out_of_bounds(x+1, y)) {
-                    map[y][x] = Entity.VISITED;
-                } else if (map[y][x+1] == Entity.VOID || map[y][x+1] == Entity.VISITED) {
-                    map[y][x] = Entity.VISITED;
-                    map[y][++x] = Entity.RIGHT;
-                } else {
-                    map[y][x] = map[y][x].turn_90()!;
-                }
-            case Entity.DOWN: 
-                if (out_of_bounds(x, y+1)) {
-                    map[y][x] = Entity.VISITED;
-                } else if (map[y+1][x] == Entity.VOID || map[y+1][x] == Entity.VISITED) {
-                    map[y][x] = Entity.VISITED;
-                    map[++y][x] = Entity.DOWN;
-                } else {
-                    map[y][x] = map[y][x].turn_90()!;
-                }
-            case Entity.LEFT:
-                if (out_of_bounds(x-1, y)) {
-                    map[y][x] = Entity.VISITED;
-                } else if (map[y][x-1] == Entity.VOID || map[y][x-1] == Entity.VISITED) {
-                    map[y][x] = Entity.VISITED;
-                    map[y][--x] = Entity.LEFT;
-                } else {
-                    map[y][x] = map[y][x].turn_90()!;
-                }
-            default: 
-                active = false;
-        }
-    }
-
-    //map.view();
-    return count(map, Entity.VISITED);
-}
-
-// solution is not correct
-fn long! part2()
-{
-    Entity[SIZE][SIZE] map = load_map()!;
-    int[<2>] guard = map.guard();
-    int x = guard[0];
-    int y = guard[1];
-    bool active = true;
-
-    int loops = 0;
-    for(int i = 0; i< SIZE*SIZE; i++) {
-        if (out_of_bounds(x, y)) active = false;
-        switch (map[y][x]) {
-            case Entity.UP:  
-                if (out_of_bounds(x, y-1)) break;
-                if (map[y-1][x] == Entity.RIGHT) {
-                    loops++;
-                }
-                if (map[y-1][x] == Entity.WALL) {
-                    map[y][x] = map[y][x].turn_90()!;
-                } else {
-                    map[--y][x] = Entity.UP;
-                }
-            case Entity.RIGHT: 
-                if (out_of_bounds(x+1, y)) break;
-                if (map[y][x+1] == Entity.DOWN) {
-                    loops++;
-                }
-                if (map[y][x+1] == Entity.WALL) {
-                    map[y][x] = map[y][x].turn_90()!;
-                } else {
-                    map[y][++x] = Entity.RIGHT;
-                }
-            case Entity.DOWN: 
-                if (out_of_bounds(x, y+1)) break;
-                if (map[y+1][x] == Entity.LEFT) {
-                    loops++;
-                }
-                if (map[y+1][x] == Entity.WALL) {
-                    map[y][x] = map[y][x].turn_90()!;
-                } else {
-                    map[++y][x] = Entity.DOWN;
-                }
-            case Entity.LEFT:
-                if (out_of_bounds(x-1, y)) break;
-                if (map[y][x-1] == Entity.UP) {
-                    loops++;
-                }
-                if (map[y][x-1] == Entity.WALL) {
-                    map[y][x] = map[y][x].turn_90()!;
-                } else {
-                    map[y][--x] = Entity.LEFT;
-                }
-            default: 
-                active = false;
-        }
-    }
-
-    //map.view();
-    return loops;
-}
-
-fn void main()
-{
-    Clock c = clock::now();
-    io::printfn("- Part1: %d - %s", part1()!!, c.mark());
-    io::printfn("- Part2: %d - %s", part2()!!, c.mark());
 }
 
