@@ -11,7 +11,6 @@ fn void main()
 
 def Pos = isz[<2>];
 def Garden = List(<Region>);
-Pos[4] dirs = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 
 struct Region 
 {
@@ -82,8 +81,8 @@ fn void! traverse(Region *region, List(<Pos>) *visited, Pos init, String[] map)
         region.locations.push(pos);
         region.fences += 4;
         
-        foreach(dir: dirs) {
-            Pos next = pos + dir;
+        foreach(Dir dir: { Dir.S, Dir.N, Dir.E, Dir.W}) {
+            Pos next = pos + dir.pos;
             if (next.x < 0 || next.x >= map.len) continue;
             if (next.y < 0 || next.y >= map.len) continue;
             if (map[next.y][next.x] == region.plant) {
@@ -94,62 +93,40 @@ fn void! traverse(Region *region, List(<Pos>) *visited, Pos init, String[] map)
     }
 }
 
-Pos[8] all_dirs = { 
-    { 1, 0 }, //0 S 
-    {-1, 0 }, //1 N
-    { 0, 1 }, //2 E
-    { 0,-1 }, //3 W
-    { 1, 1 }, //4 SE
-    {-1,-1 }, //5 NW
-    { 1,-1 }, //6 SW
-    {-1, 1 }  //7 NE
-};
+enum Dir : (Pos pos) {
+    S  = { 1, 0 },
+    SE = { 1, 1 },
+    SW = { 1,-1 },
+    E  = { 0, 1 },
+    W  = { 0,-1 },
+    N  = {-1, 0 },
+    NE = {-1, 1 },
+    NW = {-1,-1 },
+}
+
+fn bool Region.has(&self, Pos pos, Dir dir) => self.locations.contains(pos + dir.pos); 
 
 fn usz edges(Region *region)
 {
     usz edges;
     foreach(Pos pos: region.locations) {
-        // ?? 
-        // ?X
-        if (!region.locations.contains(pos + all_dirs[1]) && !region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[5])) {
+        if (!region.has(pos, Dir.W) && !region.has(pos, Dir.NW) && !region.has(pos, Dir.N)) edges++;
+        if (!region.has(pos, Dir.N) && !region.has(pos, Dir.NE) && !region.has(pos, Dir.E)) edges++;
+        if (!region.has(pos, Dir.E) && !region.has(pos, Dir.SE) && !region.has(pos, Dir.S)) edges++;
+        if (!region.has(pos, Dir.S) && !region.has(pos, Dir.SW) && !region.has(pos, Dir.W)) edges++;
+        if (region.has(pos, Dir.W) && region.has(pos, Dir.N) && !region.has(pos, Dir.NW)) edges++;
+        if (region.has(pos, Dir.N) && region.has(pos, Dir.E) && !region.has(pos, Dir.NE)) edges++;
+        if (region.has(pos, Dir.E) && region.has(pos, Dir.S) && !region.has(pos, Dir.SE)) edges++;
+        if (region.has(pos, Dir.S) && region.has(pos, Dir.W) && !region.has(pos, Dir.SW)) edges++;
+        if (region.has(pos, Dir.SE) && !region.has(pos, Dir.E) && !region.has(pos, Dir.S)) {
             edges++;
-        } 
-        // ?? 
-        // X?
-        if (!region.locations.contains(pos + all_dirs[1]) && !region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[7])) {
-            edges++;
-        } 
-        // X? 
-        // ??
-        if (!region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[4])) {
             edges++;
         }
-        // ?X 
-        // ??
-        if (!region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[6])) {
+        if (region.has(pos, Dir.NE) && !region.has(pos, Dir.N) && !region.has(pos, Dir.E)) {
+            edges++;
             edges++;
         }
-        // ?X
-        // XX
-        if (region.locations.contains(pos + all_dirs[1]) && region.locations.contains(pos + all_dirs[3]) && !region.locations.contains(pos + all_dirs[5])) {
-            edges++;
-        }
-        // X?
-        // XX
-        if (region.locations.contains(pos + all_dirs[1]) && region.locations.contains(pos + all_dirs[2]) && !region.locations.contains(pos + all_dirs[7])) {
-            edges++;
-        }
-        // XX
-        // X?
-        if (region.locations.contains(pos + all_dirs[2]) && region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[4])) {
-            edges++;
-        }
-        // XX
-        // ?X
-        if (region.locations.contains(pos + all_dirs[3]) && region.locations.contains(pos + all_dirs[0]) && !region.locations.contains(pos + all_dirs[6])) {
-            edges++;
-        }
-        
+
     }
     return edges;
 }
