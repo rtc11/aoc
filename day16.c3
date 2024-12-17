@@ -9,50 +9,36 @@ fn void! main()
 }
 
 const int SIZE = 141;
+def Pos = int[<2>];
 def Map = int[5][SIZE][SIZE];
 Map map;
-
-/*
-int[<2>][4] dirs = {
-    { 1, 0 }, // E
-    { 0,-1 }, // N
-    {-1, 0 }, // W
-    { 0, 1 }, // S
-};
-*/
 
 fn int! part1()
 {
     //String input = (String) file::load_temp("example1")!; // 7036
     //String input = (String) file::load_temp("example2")!; // 11048
     String input = (String) file::load_temp("input")!;
-    int start_x, start_y, end_x, end_y;
+    Pos start, end;
 
     foreach (int y, line : input.trim().tsplit("\n")) {
         foreach(int x, ch: line) {
             map[x][y][0] = ch;
-            if (ch == 'S') {
-                start_x = x;
-                start_y = y;
-            }
-            if (ch == 'E') {
-                end_x = x;
-                end_y = y;
-            };
+            if (ch == 'S') start = {x, y}; 
+            if (ch == 'E') end = {x, y};
         }
     }
 
-    map[start_x][start_y][2] = 1;
+    map[start.x][start.y][2] = 1;
 
-    calc(start_x, start_y);
+    walk(start.x, start.y);
     io::printn();
 
     return min(
         int[4] {
-            map[end_x][end_y][1],
-            map[end_x][end_y][2],
-            map[end_x][end_y][3],
-            map[end_x][end_y][4],
+            map[end.x][end.y][1],
+            map[end.x][end.y][2],
+            map[end.x][end.y][3],
+            map[end.x][end.y][4],
         },
     ) -1;
 }
@@ -68,9 +54,8 @@ fn int min(int[4] num)
     return smallest;
 }
 
-fn void calc(int x, int y)
+fn void walk(int x, int y)
 {
-    //io::printf("(%d,%d),", y+1, x+1);
     int pass;
     int[4] cost = { 
         map[x][y][1] + 1000,
@@ -89,7 +74,7 @@ fn void calc(int x, int y)
         if((!map[x-1][y][1]) || map[x-1][y][1] > pass) 
         {
             map[x-1][y][1] = pass;
-            calc(x-1, y);
+            walk(x-1, y);
         }
     }
 
@@ -101,7 +86,7 @@ fn void calc(int x, int y)
         if((!map[x][y+1][2]) || map[x][y+1][2] > pass) 
         {
             map[x][y+1][2] = pass;
-            calc(x, y+1);
+            walk(x, y+1);
         }
     }
     if (map[x+1][y][0] != '#')
@@ -112,7 +97,7 @@ fn void calc(int x, int y)
         if((!map[x+1][y][3]) || map[x+1][y][3] > pass) 
         {
             map[x+1][y][3] = pass;
-            calc(x+1, y);
+            walk(x+1, y);
         }
     }
     if (map[x][y-1][0] != '#')
@@ -123,7 +108,7 @@ fn void calc(int x, int y)
         if((!map[x][y-1][4]) || map[x][y-1][4] > pass) 
         {
             map[x][y-1][4] = pass;
-            calc(x, y-1);
+            walk(x, y-1);
         }
     }
 }
