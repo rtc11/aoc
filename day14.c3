@@ -71,10 +71,14 @@ fn bool has_formation(List(<Robot>)* robots, int steps)
     return false;
 }
 
-fn void print(char[WIDTH][HEIGHT] map)
+fn void print(List(<Robot>) robots)
 {
-    for(int y; y<map.len; y++){
-        for(int x; x<map[0].len; x++){
+    for(int y; y<HEIGHT; y++){
+        for(int x; x<WIDTH; x++){
+            foreach(r: robots) {
+
+            }
+            if (robot)
             io::printf("%c", map[y][x]);
         }
         io::printn();
