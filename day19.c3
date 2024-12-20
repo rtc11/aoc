@@ -8,7 +8,10 @@ fn void! main()
     };
 }
 
-const String FILE = "example1";
+const String FILE = "input";
+
+def Mem = HashMap(<String, bool>); 
+Mem mem;
 
 fn int! part1()
 {
@@ -18,11 +21,8 @@ fn int! part1()
     String[] pattern = part[1].trim().tsplit("\n");
     int sum;
 
-    long[100] mem;
-    mem[..] = -1;
-
-    foreach(p: pattern) {
-        if(p.match(towels, mem)) {
+    foreach(i, p: pattern) {
+        if(p.match(towels)) {
             sum++;
         }
     }
@@ -30,8 +30,9 @@ fn int! part1()
     return sum;
 }
 
-fn bool String.match(self, String[] towels, long[100] mem)
+fn bool String.match(self, String[] towels)
 {
+    if (mem.has_key(self)) return false;
     foreach(towel: towels)
     {
         if (towel.len == self.len && self == towel)
@@ -41,13 +42,14 @@ fn bool String.match(self, String[] towels, long[100] mem)
         if (towel.len < self.len && (String) self[..towel.len-1] == towel)
         {
             String substr = (String) self[towel.len..];
-            if (substr.match(towels, mem))
+            if (substr.match(towels))
             {
                 return true;
             }
         }
     }
 
+    mem[self] = true;
     return false;
 }
 
