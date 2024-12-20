@@ -1,0 +1,53 @@
+import std::io, std::time, std::collections, std::math;
+
+fn void! main()
+{
+    @pool() {
+        Clock c = clock::now();
+        io::printfn("- Part1: %d - %s", part1()!, c.mark());
+    };
+}
+
+const String FILE = "example1";
+
+fn int! part1()
+{
+    String input = (String) file::load_temp(FILE)!;
+    String[] part = input.trim().tsplit("\n\n");
+    String[] towels = part[0].trim().tsplit(", ");
+    String[] pattern = part[1].trim().tsplit("\n");
+    int sum;
+
+    long[100] mem;
+    mem[..] = -1;
+
+    foreach(p: pattern) {
+        if(p.match(towels, mem)) {
+            sum++;
+        }
+    }
+
+    return sum;
+}
+
+fn bool String.match(self, String[] towels, long[100] mem)
+{
+    foreach(towel: towels)
+    {
+        if (towel.len == self.len && self == towel)
+        {
+            return true;
+        }
+        if (towel.len < self.len && (String) self[..towel.len-1] == towel)
+        {
+            String substr = (String) self[towel.len..];
+            if (substr.match(towels, mem))
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+

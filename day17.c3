@@ -4,7 +4,7 @@ fn void main()
 {
     @pool() {
         Clock c = clock::now();
-        io::printfn("- Part1: %s - %s", part1(), c.mark());
+        //io::printfn("- Part1: %s - %s", part1(), c.mark());
         io::printfn("- Part2: %d - %s", part2(), c.mark());
     };
 }
@@ -14,6 +14,11 @@ const int B = 1;
 const int C = 2;
 isz[3] reg;
 
+struct State {
+    usz rem;
+    long est;
+}
+
 fn String part1()
 {
     reg[A] = 24847151;
@@ -21,24 +26,48 @@ fn String part1()
     return solve(program);
 }
 
-fn isz part2()
+fn long part2()
 {
-    int[] program = { 2,4,1,5,7,5,1,6,0,3,4,0,5,5,3,0 };
-    String res = solve(program);
-    isz i = 35500000000000; // < i*10
-    while (res != "2,4,1,5,7,5,1,6,0,3,4,0,5,5,3,0,") {
-        reg[A] = i++;
-        reg[B] = 0;
-        reg[C] = 0;
-        res = solve(program);
+    reg[A] = 117440;
+    int[] program = { 0, 3, 5, 4, 3, 0 };
+    return bfs(program);
+}
+
+fn long bfs(int[] program)
+{
+    long a;
+    List(<State>) stack = *stack.temp_init();
+    stack.push({ .rem = program.len - 1, .est = 0 });
+    while LOOP: (stack.len())
+    {
+        State s = stack.pop_first()!!;
+        for (int i = 0; i< 8; i++) {
+            a = (s.est << 3) + i;
+            reg[A] = a;
+            reg[B] = 0;
+            reg[C] = 0;
+            
+            int[] expand_program = program[s.rem..];
+            io::printf("i:%d, A:%d, a:%d solve(%s)", i, reg[A], a, expand_program);
+            String expect = join(expand_program);
+            String actual = solve(expand_program);
+            io::printfn(" => %s==%s", expect, actual);
+
+            if (actual.trim() == expect.trim()) {
+                io::printfn("equals!");
+                if (s.rem == 0) break LOOP;
+                stack.push({ .rem = s.rem - 1, .est = a });
+            }
+        }
     }
-    return i - 1;
+    
+    return a;
 }
 
 fn String solve(int[] program) {
     int inst_p;
     DString out;
-    
+
     while RUNNING: (inst_p < program.len -1)
     {
         int inst = program[inst_p];
@@ -48,7 +77,13 @@ fn String solve(int[] program) {
             case 0: reg[A] = divide(reg[A], combo_op(operand));
             case 1: reg[B] = xor(reg[B], operand);
             case 2: reg[B] = mod(combo_op(operand), 8);
-            case 3: if (reg[A] != 0) { inst_p = operand; inst_p-=2; } else { break RUNNING; }
+            case 3: 
+                if (reg[A] != 0) { 
+                    inst_p = operand; 
+                    inst_p-=2; 
+                } else { 
+                    break RUNNING;
+                }
             case 4: reg[B] = xor(reg[B], reg[C]);
             case 5: out.append(string::tformat("%s,", mod(combo_op(operand), 8)));
             case 6: reg[B] = divide(reg[A], combo_op(operand));
@@ -56,6 +91,8 @@ fn String solve(int[] program) {
             default: break RUNNING;
         }
         inst_p+=2;
+
+        //io::printfn("i:%d o:%d ip:%d, A:%d B:%d C:%d >>%s", inst, operand, inst_p, reg[A], reg[B], reg[C], out.str_view());
     }
     return out.str_view();
 }
@@ -77,4 +114,14 @@ fn isz combo_op(int op)
         case 6: return reg[C];
         default: unreachable();
     }
+}
+
+fn String join(int[] list)
+{
+    DString sb;
+    foreach(i, t : list) {
+        sb.append_chars(string::tformat("%d", t));
+        sb.append_chars(",");
+    }
+    return sb.str_view();
 }
