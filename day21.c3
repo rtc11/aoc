@@ -4,121 +4,174 @@ fn void! main()
 {
     @pool() {
         Clock c = clock::now();
-        long test = solve("test")!;
-        io::printfn("- Test1: %d - %s", test, c.mark());
-        assert(test == 126384, "test example failed ");
-        long part1 = solve("input")!;
-        io::printfn("- Part1: %d - %s", part1, c.mark());
-        assert(part1 < 239088, "part1 too high");
+        io::printfn("- Part1: %d - %s", solve(&part1)!, c.mark());
+        io::printfn("- Part2: %d - %s", solve(&part2)!, c.mark());
     };
 }
 
-def Pos = int[<2>];
-def Map = HashMap(<char, Pos>);
-def Arm = fn char[]!(Map, Pos, char);
-Map numpad;
-Map controller;
-
-fn List(<String>)! List(<String>).move(&self, Map pad)
+def Calc = fn long(long[<NUMS*NUMS>]);
+fn long! solve(Calc calc)
 {
-    Pos pos = pad['A']!;
-    List(<String>) pad_moves;
-    foreach(moves: self) {
-        DString res;
-        foreach(m : moves) {
-            res.append((String) to_moves(pad, pos, m)!);
-            pos = pad[m]!;
-        }
-        // io::printfn("%s: %s", moves, res);
-        pad_moves.push(res.str_view());
-    }
-    return pad_moves;
-}
+    String input = (String) file::load_temp("input")!;
+    long[<NUMS * NUMS>] counts = 0;
 
-fn long! solve(String file)
-{
-    String input = (String) file::load_temp(file)!;
-    List(<String>) codes;
-    foreach(m: input.trim().tsplit("\n")) codes.push(m);
-
-    init_num_pad();
-    init_dir_pad();
-
-    List(<String>) numpad_moves = codes.move(numpad)!;
-    List(<String>) r1_moves = numpad_moves.move(controller)!;
-    List(<String>) r2_moves = r1_moves.move(controller)!;
-    int sum;
-    foreach(i, m: r2_moves) {
-        int num = codes[i][0..^2].to_int()!; // len-2 
-        sum += m.len * num;
-        io::printfn("%d * %d", m.len, num);
-    }
-    return sum;
-}
-
-fn char[]! to_moves(Map pad, Pos pos, char button)
-{
-    Pos moves = pad[button]! - pos;
-    List(<char>) chs = *chs.temp_init();
-    int size;
-    // TODO: shortest path
-    if ((pad.len() == 11 && pos.y == 3) || (pad.len() == 5 && pos.y == 0)) {
-        switch {
-            case moves.y < 0: for(int i = 0; i < math::abs(moves.y); i++) chs.push('^');
-            case moves.y > 0: for(int i = 0; i < math::abs(moves.y); i++) chs.push('v');
+    foreach(line : input.trim().tsplit("\n")) {
+        int num = line.trim()[..^2].to_int()!;
+        List(<int>) chars;
+        chars.push(encode('A'));
+        foreach(c: line.trim()) {
+            chars.push(encode(c));
         }
-        switch  {
-            case moves.x > 0: for(int i = 0; i < math::abs(moves.x); i++) chs.push('>');
-            case moves.x < 0: for(int i = 0; i < math::abs(moves.x); i++) chs.push('<');
-        }
-    } else {
-        switch  {
-            case moves.x > 0: for(int i = 0; i < math::abs(moves.x); i++) chs.push('>');
-            case moves.x < 0: for(int i = 0; i < math::abs(moves.x); i++) chs.push('<');
-        }
-        switch {
-            case moves.y < 0: for(int i = 0; i < math::abs(moves.y); i++) chs.push('^');
-            case moves.y > 0: for(int i = 0; i < math::abs(moves.y); i++) chs.push('v');
+
+        for(long i; i < chars.len()-1; i++) {
+            int a = chars[i];
+            int b = chars[i+1];
+            counts[a * NUMS + b] += num;
         }
     }
-    chs.push('A');
-    return chs.to_tarray();
+
+    return calc(counts);
 }
 
-// +---+---+---+
-// | 7 | 8 | 9 |
-// +---+---+---+
-// | 4 | 5 | 6 |
-// +---+---+---+
-// | 1 | 2 | 3 |
-// +---+---+---+
-//     | 0 | A |
-//     +---+---+
-fn void init_num_pad() 
-{
-    numpad['7'] = Pos{0, 0};
-    numpad['8'] = Pos{1, 0};
-    numpad['9'] = Pos{2, 0};
-    numpad['4'] = Pos{0, 1};
-    numpad['5'] = Pos{1, 1};
-    numpad['6'] = Pos{2, 1};
-    numpad['1'] = Pos{0, 2};
-    numpad['2'] = Pos{1, 2};
-    numpad['3'] = Pos{2, 2};
-    numpad['0'] = Pos{1, 3};
-    numpad['A'] = Pos{2, 3};
-}
+fn long part1(long[<NUMS*NUMS>] counts) => (counts*LUT3).sum();
+fn long part2(long[<NUMS*NUMS>] counts) => (counts*LUT26).sum();
 
-//     +---+---+
-//     | ^ | A |
-// +---+---+---+
-// | < | v | > |
-// +---+---+---+
-fn void init_dir_pad() 
-{
-    controller['^'] = Pos{1, 0};
-    controller['A'] = Pos{2, 0};
-    controller['<'] = Pos{0, 1};
-    controller['v'] = Pos{1, 1};
-    controller['>'] = Pos{2, 1};
-}
+fn int encode(char c) => c % 16 + (c / 64) * 9;  
+
+const long NUMS = 11; // [0-9,A]
+
+// every pre-calculated paths on the directional keypad
+const long[<NUMS*NUMS>] LUT3 = {
+    1, 25, 12, 19, 26, 13, 20, 27, 14, 21, 10, 21, 1, 10, 11, 12, 19, 20, 13, 20, 21, 22, 16, 18,
+    1, 10, 21, 12, 19, 22, 13, 20, 17, 21, 19, 18, 1, 22, 21, 12, 23, 22, 13, 16, 22, 16, 17, 18,
+    1, 10, 11, 12, 19, 20, 23, 17, 21, 16, 17, 18, 1, 10, 21, 12, 19, 18, 22, 22, 21, 16, 19, 18,
+    1, 22, 21, 12, 17, 23, 17, 18, 19, 16, 17, 18, 1, 10, 11, 24, 18, 22, 17, 18, 21, 16, 17, 18,
+    1, 10, 19, 23, 23, 22, 17, 22, 21, 16, 19, 18, 1, 18, 18, 26, 21, 12, 27, 22, 13, 28, 23, 14,
+    1,
+};
+
+// every pre-calculated paths on the numeric keypad
+const long[<NUMS*NUMS>] LUT26 = {
+    1,
+    31420065369,
+    14752615084,
+    24095973437,
+    31420065370,
+    14752615085,
+    24095973438,
+    31420065371,
+    14752615086,
+    24095973439,
+    14287938116,
+    27052881363,
+    1,
+    14287938116,
+    14287938117,
+    14752615084,
+    24095973437,
+    24095973438,
+    14752615085,
+    24095973438,
+    24095973439,
+    27052881364,
+    20790420654,
+    22411052532,
+    1,
+    14287938116,
+    28154654777,
+    14752615084,
+    24095973437,
+    28154654778,
+    14752615085,
+    24095973438,
+    22778092491,
+    27622800565,
+    22411052533,
+    22411052532,
+    1,
+    28154654778,
+    28154654777,
+    14752615084,
+    28154654779,
+    28154654778,
+    14752615085,
+    20790420654,
+    27052881364,
+    20790420654,
+    22778092491,
+    22778092492,
+    1,
+    14287938116,
+    14287938117,
+    14752615084,
+    24095973437,
+    24095973438,
+    27052881365,
+    20790420655,
+    27622800565,
+    20790420654,
+    22778092491,
+    22411052532,
+    1,
+    14287938116,
+    28154654777,
+    14752615084,
+    24095973437,
+    22778092492,
+    27622800566,
+    27622800566,
+    27622800565,
+    20790420654,
+    22411052533,
+    22411052532,
+    1,
+    28154654778,
+    28154654777,
+    14752615084,
+    20790420655,
+    27052881365,
+    20790420655,
+    22778092492,
+    22778092493,
+    20790420654,
+    22778092491,
+    22778092492,
+    1,
+    14287938116,
+    14287938117,
+    27052881366,
+    20790420656,
+    27622800566,
+    20790420655,
+    22778092492,
+    27622800565,
+    20790420654,
+    22778092491,
+    22411052532,
+    1,
+    14287938116,
+    22778092493,
+    27622800567,
+    27622800567,
+    27622800566,
+    20790420655,
+    27622800566,
+    27622800565,
+    20790420654,
+    22411052533,
+    22411052532,
+    1,
+    20790420656,
+    22411052532,
+    31420065370,
+    28154654777,
+    14752615084,
+    31420065371,
+    28154654778,
+    14752615085,
+    31420065372,
+    28154654779,
+    14752615086,
+    1,
+};
+
