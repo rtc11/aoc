@@ -1,17 +1,2 @@
-# Idea project files
-*.iml
-.idea/
-!.idea/codeStyles/
-.run
-
-# Gradle files
-out/
-build/
-.gradle/
-
-# Generated sources
-src/generated
-
-# OS specific
-.DS_Store
-.devcontainer
+2019/**/main
+2019/**/input.txt
