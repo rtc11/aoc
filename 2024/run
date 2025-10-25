@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -xe
+
+watchexec -w $1 c3c compile-run $1
+

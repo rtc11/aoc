@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Except...
+!.gitignore
+!.gitattributes
+!*.c3
+!run
+!README.md
+
