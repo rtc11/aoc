@@ -22,24 +22,45 @@
         01 record_data_len PIC 99. *> two byte num (00-99)
 
 
-        01 mass PIC 9(6).
+        01 mass PIC S9(6).
+        01 temp_mass PIC S9(6).
         01 divisor PIC 9 value 3.
         01 subtractor PIC 9 value 2.
-        01 fuel PIC 9(5).
-        01 total_fuel PIC 9(7) VALUE ZERO.
+        01 fuel PIC S9(5).
+        01 temp_fuel PIC S9(7).
+        01 total_fuel_p1 PIC 9(7) VALUE ZERO.
+        01 total_fuel_p2 PIC 9(7) VALUE ZERO.
 
         PROCEDURE DIVISION.
         main.
            PERFORM read_file
-           DISPLAY "Total fuel: " total_fuel.
+           DISPLAY "Part 1: " total_fuel_p1.
+           DISPLAY "Part 2: " total_fuel_p2.
            STOP run.
 
         part1.
-           DIVIDE mass BY divisor GIVING fuel 
-           SUBTRACT subtractor FROM fuel 
-           *> display "Mass:" mass " -> Fuel:" fuel.
-           ADD fuel TO total_fuel.
+           MOVE MASS TO temp_mass.
+           PERFORM calculate_fuel
+           ADD fuel TO total_fuel_p1.
            MOVE ZERO TO fuel.
+
+        part2.
+           MOVE MASS TO temp_mass.
+           PERFORM UNTIL temp_mass IS NOT POSITIVE
+               PERFORM calculate_fuel
+               IF fuel IS NOT POSITIVE
+                   EXIT PERFORM
+               END-IF
+               ADD fuel TO temp_fuel
+               MOVE fuel to temp_mass
+           END-PERFORM.
+           ADD temp_fuel to total_fuel_p2.
+           MOVE ZERO TO fuel.
+           MOVE ZERO TO temp_fuel.
+
+        calculate_fuel.
+           DIVIDE temp_mass BY divisor GIVING fuel
+           SUBTRACT subtractor FROM fuel.
 
         read_file.
            OPEN INPUT input_file.
@@ -57,6 +78,7 @@
                )
 
                PERFORM part1 
+               PERFORM part2 
 
                PERFORM read_next_record
            END-PERFORM.
