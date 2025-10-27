@@ -1,5 +1,0 @@
-#!/bin/sh
-
-set -e
-
-watchexec -e cbl -e txt cobc -O2 -F -x main.cbl

@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# COBOL Build and Run Watcher Script
+# Usage: ./cobol.sh {build|run} <source_file.cbl>
+#
+# Requires:
+# 1. watchexec (https://github.com/watchexec/watchexec)
+# 2. cobc (GNU COBOL Compiler)
+
+set -e
+
+COMMAND="$1"
+COBOL_SOURCE="$2"
+
+if [ "$COMMAND" = "build" ] || [ "$COMMAND" = "run" ]; then
+    if [ -z "$COBOL_SOURCE" ]; then
+        echo "Error: Missing COBOL source file name."
+        echo "Usage: $0 {build|run} <source_file.cbl>"
+        exit 1
+    fi
+
+    EXECUTABLE_BASE=$(basename "$COBOL_SOURCE" .cbl)
+    EXECUTABLE_NAME="./$EXECUTABLE_BASE"
+fi
+
+case "$COMMAND" in
+    build)
+        watchexec -e cbl -e txt cobc -O2 -F -x "$COBOL_SOURCE" -o solution
+        ;;
+
+    run)
+        watchexec -f "$EXECUTABLE_BASE" time ./solution
+        ;;
+
+    *)
+        echo "Usage: $0 {build|run} <source_file.cbl>"
+        echo "  build <file.cbl>      Build the exeutable (in watch mode)"
+        echo "  run <file.cbl>        Run the executable  (in watch mode)"
+        exit 1
+        ;;
+esac
+

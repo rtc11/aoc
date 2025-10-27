@@ -1,5 +1,0 @@
-#!/bin/sh
-
-set -e
-
-watchexec -f main time ./main
