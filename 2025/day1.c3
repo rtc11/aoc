@@ -27,6 +27,7 @@ fn void main()
         if (dial == 0) p1++;
         // io::printfn("%s points at %d", line, dial);
     }
+
 }
 
 fn void turn_right(int turn)

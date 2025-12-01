@@ -1,2 +1,6 @@
 *.dSYM/
 input.txt
+test.txt
+*
+!*/
+!*.c3
