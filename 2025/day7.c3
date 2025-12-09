@@ -48,21 +48,21 @@ fn void? part2()
 	File f = file::open("input.txt", "rb")!;
 	defer (void)f.close();
 	String last = io::treadline(&f)!;
-	long[200] timelines;
+	long[142] timelines;
 	foreach (i, c : last) timelines[i] = c == 'S' ? 1 : 0;
 	while (try line = io::treadline(&f)) {
-		long[200] temp;
+		long[142] new;
 		foreach (i, timeline : timelines) {
 			if (!timeline) continue;
 			switch (line[i]) {
 				case '.':
-					temp[i] += timeline;
+					new[i] += timeline;
 				case '^':
-					temp[i - 1] += timeline;
-					temp[i + 1] += timeline;
+					new[i - 1] += timeline;
+					new[i + 1] += timeline;
 			}
 		}
-		timelines = temp;
+		timelines = new;
 	}
 	foreach (timeline : timelines) p2 += timeline;
 }
