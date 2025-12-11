@@ -26,7 +26,7 @@ fn void main() => @pool() {
     defer io::printfn("part2 %d %s", p2, c.mark());
 
     solve(1, "input.txt", "you")!!;
-    solve(2, "test2.txt", "svr")!!;
+    solve(2, "input.txt", "svr")!!;
 }
 
 
@@ -52,14 +52,14 @@ fn void? solve(int part, String file_name, String start_name)
     List{Path} paths;
     List{Node*} current_path;
     current_path.push(start);
-    List{String} visit;
+    HashSet{String} visit;
     dfs(start, end, current_path, paths, part, visit);
 }
 
-fn void dfs(Node* current, Node* end, List{Node*} current_path, List{Path} all_paths, int part, List{String} visit)
+fn void dfs(Node* current, Node* end, List{Node*} current_path, List{Path} all_paths, int part, HashSet{String} visit)
 {
     if (visit.contains(current.name)) return;
-    visit.push(current.name);
+    visit.add(current.name);
 
     if (*current == *end) {
         if (part == 1) p1++;
@@ -84,6 +84,6 @@ fn void dfs(Node* current, Node* end, List{Node*} current_path, List{Path} all_p
         dfs(neighbour, end, current_path, all_paths, part, visit); 
         current_path.remove_last()!!;
     }
-    visit.remove_item(current.name);
+    visit.remove(current.name);
 }
 
