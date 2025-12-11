@@ -1,89 +1,65 @@
-import std::io;
-import std::time::clock;
-import std::collections::list;
-import std::collections::set;
-import std::collections::map;
-import std::sort;
-import std::math;
+import std::io, std::time::clock, std::collections::list;
 
-alias Graph = HashMap{String, Node*};
-alias Path = List{Node*};
+const usz GRAPH_SIZE = 17576;
+const ulong MAX_ULONG = 0xFFFFFFFFFFFFFFFF;
 
-struct Node {
-    String name;
-    List{Node*} neighbours;
-}
-
-fn bool Node.eq(self, Node other) @operator(==) => self.name == other.name;
-macro uint Node.hash(self) => self.name.hash();
-
-long p1;
-long p2;
+alias Neighbours = List{usz};
+alias Graph = List{Neighbours};
 
 fn void main() => @pool() {
     Clock c = clock::now();
-    defer io::printfn("part1 %d %s", p1, c.mark());
-    defer io::printfn("part2 %d %s", p2, c.mark());
-
-    solve(1, "input.txt", "you")!!;
-    solve(2, "input.txt", "svr")!!;
+    io::printfn("part1 %d %s", part1("input.txt"), c.mark());
+    io::printfn("part2 %d %s", part2("input.txt"), c.mark());
 }
 
+fn usz part1(String file_name) {
+    Graph* graph_ptr = allocator::new(tmem, Graph);
+    *graph_ptr = parse(file_name);
+    return paths(graph_ptr, "you", "out");
+}
 
-fn void? solve(int part, String file_name, String start_name) 
-{
+fn usz part2(String file_name) {
+    Graph* graph_ptr = allocator::new(tmem, Graph);
+    *graph_ptr = parse(file_name);
+    ulong one = paths(graph_ptr, "svr", "fft") * paths(graph_ptr, "fft", "dac") * paths(graph_ptr, "dac", "out");
+    ulong two = paths(graph_ptr, "svr", "dac") * paths(graph_ptr, "dac", "fft") * paths(graph_ptr, "fft", "out");
+    return one + two;
+}
+
+fn Graph parse(String file_name) {
     String input = (String) file::load(tmem, file_name)!!;
     String[] rows = input.tsplit("\n", skip_empty:true);
-
-    Graph map;
-    Node* start;
-    Node* end;
-    foreach(row : rows) {
-        String[] parts = row.tsplit(" ");
-        String name = parts[0][:^1];
-        Node* n = map.@get_or_set(name, allocator::new(tmem, Node, { .name = name })); 
-        if (n.name == start_name) start = n;
-        foreach(dest : parts[1..]) {
-            Node* neigh = map.@get_or_set(dest, allocator::new(tmem, Node, { .name = dest })); 
-            if (neigh.name == "out") end = neigh;
-            n.neighbours.push(neigh);
+    Graph graph;
+    for(int i; i< GRAPH_SIZE; i++) graph.push({});
+    foreach(row: rows) {
+        String[] edges = row.tsplit(" ");
+        usz from_idx = edges[0][:^1].to_index(); 
+        for (usz i = 1; i < edges.len; i++) {
+            graph[from_idx].push(edges[i].to_index()); 
         }
     }
-    List{Path} paths;
-    List{Node*} current_path;
-    current_path.push(start);
-    HashSet{String} visit;
-    dfs(start, end, current_path, paths, part, visit);
+    return graph;
 }
 
-fn void dfs(Node* current, Node* end, List{Node*} current_path, List{Path} all_paths, int part, HashSet{String} visit)
-{
-    if (visit.contains(current.name)) return;
-    visit.add(current.name);
+fn ulong dfs(Graph* graph, ulong* cache, usz node, usz end) {
+    if (node == end) return 1UL;
+    if (cache[node] != MAX_ULONG) return cache[node];
+    ulong result = 0UL;
+    Neighbours neighbours = graph.get(node); 
+    foreach (next_node: neighbours) result += dfs(graph, cache, next_node, end);
+    cache[node] = result;
+    return result;
+}
 
-    if (*current == *end) {
-        if (part == 1) p1++;
+fn ulong paths(Graph* graph, String from, String to) {
+    ulong* cache = allocator::new(tmem, ulong[GRAPH_SIZE]); 
+    for(usz i; i < GRAPH_SIZE; i++) cache[i] = MAX_ULONG;
+    return dfs(graph, cache, from.to_index(), to.to_index());
+}
 
-        if (part == 2) {
-            bool fft = false;
-            bool dac = false;
-            foreach(n: current_path) {
-                if (n.name == "fft") fft = true;
-                if (n.name == "dac") dac = true;
-            }
-            if (fft && dac) p2++;
-        }
-
-        Path complete_path;
-        foreach(ptr: current_path) complete_path.push(ptr);
-        all_paths.push(complete_path);
-    }
-
-    foreach(neighbour : current.neighbours) {
-        current_path.push(neighbour);
-        dfs(neighbour, end, current_path, all_paths, part, visit); 
-        current_path.remove_last()!!;
-    }
-    visit.remove(current.name);
+fn usz String.to_index(self) {
+    usz idx;
+    foreach(i, b: self) idx = 26 * idx + (usz)(b - 'a');
+    return idx;
 }
 
